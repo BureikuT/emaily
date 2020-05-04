@@ -7,7 +7,7 @@ function App() {
      
         <a
           className="App-link"
-          href="auth/google"
+          href="/auth/google"
           target="_blank"
           rel="noopener noreferrer"
         >
