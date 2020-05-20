@@ -3,17 +3,14 @@ import React, { Component } from "react";
 import { reduxForm, Field } from "redux-form";
 import { Link } from "react-router-dom";
 import SurveyField from "./SurveyField";
+import validateEmails from "../../utils/validateEmails";
+import formFields from './formFields'
 
-const FIELDS = [
-  { label: "Survey Title", name: "title" },
-  { label: "Subject Line", name: "subject" },
-  { label: "Email Body", name: "body" },
-  { label: "Recipient List", name: "emails" },
-];
+
 
 class SurveyForm extends Component {
   renderFields() {
-    return _.map(FIELDS, ({ label, name, key }) => {
+    return _.map(formFields, ({ label, name, key }) => {
       return (
         <div key={name}>
           <Field
@@ -30,9 +27,7 @@ class SurveyForm extends Component {
   render() {
     return (
       <div>
-        <form
-          onSubmit={this.props.handleSubmit((values) => console.log(values))}
-        >
+        <form onSubmit={this.props.handleSubmit(this.props.onSurveySubmit)}>
           {this.renderFields()}
           <Link to="/surveys" className="red btn-flat red white-text">
             Cancel
@@ -49,9 +44,15 @@ class SurveyForm extends Component {
 function validate(values) {
   const errors = {};
 
-  if (!values.title) {
-    errors.title = "You must provide a title";
-  }
+  errors.recipients = validateEmails(values.recipients || "");
+
+  _.each(formFields, ({ name }) => {
+    if (!values[name]) {
+      errors[name] = `${
+        name.charAt(0).toUpperCase() + name.slice(1)
+      } needs a value. `;
+    }
+  });
 
   return errors;
 }
@@ -59,4 +60,5 @@ function validate(values) {
 export default reduxForm({
   validate,
   form: "surveyForm",
+  destroyOnUnmount: false,
 })(SurveyForm);
